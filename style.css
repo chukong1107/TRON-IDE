@@ -1,63 +1,80 @@
-body {
-  background-color: #1e1e1e;
-  color: #f0f0f0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
-
-.container {
-  max-width: 800px;
-  margin: 40px auto;
-  background: #2e2e2e;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
-}
-
-h1 {
-  text-align: center;
-  color: #66d9ef;
-}
-
-textarea {
-  width: 100%;
-  height: 200px;
-  background: #1e1e1e;
-  color: #dcdcdc;
-  border: 1px solid #444;
-  padding: 10px;
+body {
   font-family: monospace;
-  border-radius: 6px;
-  margin-bottom: 20px;
+  background: #1e1e1e;
+  color: #ccc;
 }
-
-button {
-  background-color: #66d9ef;
-  color: #1e1e1e;
-  border: none;
-  padding: 10px 20px;
-  margin: 10px 10px 0 0;
-  border-radius: 5px;
-  cursor: pointer;
+#navbar {
+  height: 40px;
+  background: #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+}
+.logo {
+  color: #e61b72;
   font-weight: bold;
-  transition: background-color 0.3s ease;
+}
+.controls button {
+  background: #e61b72;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
 }
 
-button:hover {
-  background-color: #44c3dc;
+#main {
+  display: flex;
+  height: calc(100vh - 70px);
 }
 
-.result {
-  background-color: #3b3b3b;
-  padding: 15px;
-  margin-top: 20px;
-  border-radius: 6px;
-  color: #a6e22e;
-  word-break: break-all;
+#fileList {
+  width: 150px;
+  background: #2b2b2b;
+  padding: 10px;
+}
+#fileList ul {
+  list-style: none;
+}
+#fileList li {
+  padding: 5px;
+  cursor: pointer;
+}
+#fileList li.active {
+  background: #444;
+  color: #fff;
 }
 
-#status {
-  margin-top: 15px;
-  color: #ffd700;
+#editor {
+  flex: 1;
+  height: 100%;
+}
+
+#actions {
+  width: 200px;
+  background: #2b2b2b;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#actions button {
+  background: #444;
+  color: #eee;
+  border: 1px solid #666;
+  padding: 5px;
+  cursor: pointer;
+}
+
+#console {
+  height: 30px;
+  background: #111;
+  padding: 5px;
+  font-size: 12px;
+  overflow-x: auto;
 }
